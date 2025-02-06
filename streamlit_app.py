@@ -54,7 +54,7 @@ ETAPAS = [
                 'min_horas': 30, 
                 'max_horas': 50,
                 'actividades': [
-                    'Preparación de servidores Windows 11 Pro',
+                    'Preparación de Servidor-es',
                     'Configuración de VPN',
                     'Instalación de herramientas'
                 ]
