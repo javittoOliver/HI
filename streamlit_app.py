@@ -245,7 +245,7 @@ def generar_interfaz_dimensionamiento():
             
             with col2:
                 tarifa = st.number_input(
-                    'Tarifa/Hora', 
+                    'Costo/Hora', 
                     min_value=0, 
                     value=rol_data['tarifa_defecto'],
                     key=f"{etapa['nombre']}_{rol_data['rol']}_tarifa"
