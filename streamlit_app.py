@@ -214,7 +214,7 @@ def generar_interfaz_dimensionamiento():
     st.sidebar.header('Consumo de GenAI')
     comentarios_por_mes = st.sidebar.number_input(
         'Comentarios procesados por mes', 
-        min_value=0, value=10000, step=100
+        min_value=0, value=50000, step=100
     )
     costo_tokens = st.sidebar.number_input(
         'Costo por 1000 tokens ($)', 
