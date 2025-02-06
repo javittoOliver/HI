@@ -94,7 +94,9 @@ ETAPAS = [
                 'actividades': [
                     'Desarrollo de módulo Happiness Index',
                     'Implementación de modelo de Sentiment Analysis',
-                    'Entrenamiento de modelos de IA Generativa Loope'
+                    'Implementación de modelo de Tópicos',
+                    'Entrenamiento de modelos de IA Generativa Loope',
+                    'Desarrollo front en Power Bi'
                 ]
             },
             {
