@@ -1,56 +1,358 @@
 import streamlit as st
-from openai import OpenAI
+import pandas as pd
 
-# Show title and description.
-st.title("💬 Chatbot")
-st.write(
-    "This is a simple chatbot that uses OpenAI's GPT-3.5 model to generate responses. "
-    "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys). "
-    "You can also learn how to build this app step by step by [following our tutorial](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps)."
-)
+# Tokens: Aproximadamente 4.5 tokens por palabra en español
+TOKENS_POR_PALABRA = 4.5
 
-# Ask user for their OpenAI API key via `st.text_input`.
-# Alternatively, you can store the API key in `./.streamlit/secrets.toml` and access it
-# via `st.secrets`, see https://docs.streamlit.io/develop/concepts/connections/secrets-management
-openai_api_key = st.text_input("OpenAI API Key", type="password")
-if not openai_api_key:
-    st.info("Please add your OpenAI API key to continue.", icon="🗝️")
-else:
 
-    # Create an OpenAI client.
-    client = OpenAI(api_key=openai_api_key)
 
-    # Create a session state variable to store the chat messages. This ensures that the
-    # messages persist across reruns.
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+ETAPAS = [
+    {
+        'nombre': 'Análisis y Preparación Inicial',
+        'roles': [
+            {
+                'rol': 'Arquitecto de Soluciones', 
+                'tarifa_defecto': 9000, 
+                'min_horas': 10, 
+                'max_horas': 20,
+                'actividades': [
+                    'Relevamiento de infraestructura técnica',
+                    'Análisis de compatibilidad de datos',
+                    'Definición de alcance específico'
+                ]
+            },
+            {
+                'rol': 'Product Owner', 
+                'tarifa_defecto': 10000, 
+                'min_horas': 10, 
+                'max_horas': 15,
+                'actividades': [
+                    'Definición de requerimientos',
+                    'Priorización de funcionalidades',
+                    'Validación de objetivos'
+                ]
+            },
+            {
+                'rol': 'Analista de Negocio', 
+                'tarifa_defecto': 8000, 
+                'min_horas': 10, 
+                'max_horas': 15,
+                'actividades': [
+                    'Documentación de procesos',
+                    'Análisis de impacto',
+                    'Mapeo de flujos de trabajo'
+                ]
+            }
+        ]
+    },
+    {
+        'nombre': 'Configuración de Infraestructura',
+        'roles': [
+            {
+                'rol': 'Administrador de Sistemas', 
+                'tarifa_defecto': 9000, 
+                'min_horas': 30, 
+                'max_horas': 50,
+                'actividades': [
+                    'Preparación de servidores Windows 11 Pro',
+                    'Configuración de VPN',
+                    'Instalación de herramientas'
+                ]
+            },
+            {
+                'rol': 'DevOps Engineer', 
+                'tarifa_defecto': 10000, 
+                'min_horas': 20, 
+                'max_horas': 30,
+                'actividades': [
+                    'Configuración de pipelines',
+                    'Automatización de despliegues',
+                    'Configuración de monitoreo'
+                ]
+            },
+            {
+                'rol': 'Especialista en Seguridad', 
+                'tarifa_defecto': 10000, 
+                'min_horas': 20, 
+                'max_horas': 20,
+                'actividades': [
+                    'Implementación de protocolos de seguridad',
+                    'Configuración de cifrado',
+                    'Análisis de vulnerabilidades'
+                ]
+            }
+        ]
+    },
+    {
+        'nombre': 'Desarrollo de Módulos',
+        'roles': [
+            {
+                'rol': 'Data Scientist', 
+                'tarifa_defecto': 9000, 
+                'min_horas': 100, 
+                'max_horas': 140,
+                'actividades': [
+                    'Desarrollo de módulo Happiness Index',
+                    'Implementación de modelo de Sentiment Analysis',
+                    'Entrenamiento de modelos de IA Generativa Loope'
+                ]
+            },
+            {
+                'rol': 'Programador', 
+                'tarifa_defecto': 10000, 
+                'min_horas': 100, 
+                'max_horas': 140,
+                'actividades': [
+                    'Implementación de componentes backend',
+                    'Desarrollo de APIs',
+                    'Integración de módulos'
+                ]
+            }
+        ]
+    },
+    {
+        'nombre': 'Integración y Pruebas',
+        'roles': [
+            {
+                'rol': 'Programador', 
+                'tarifa_defecto': 10000, 
+                'min_horas': 50, 
+                'max_horas': 70,
+                'actividades': [
+                    'Pruebas de integración',
+                    'Corrección de errores',
+                    'Optimización de rendimiento'
+                ]
+            },
+            {
+                'rol': 'Data Scientist', 
+                'tarifa_defecto': 9000, 
+                'min_horas': 50, 
+                'max_horas': 70,
+                'actividades': [
+                    'Validación de modelos',
+                    'Ajuste de precisión',
+                    'Evaluación de resultados'
+                ]
+            }
+        ]
+    },
+    {
+        'nombre': 'Implementación y Capacitación',
+        'roles': [
+            {
+                'rol': 'Líder de Proyecto', 
+                'tarifa_defecto': 10000, 
+                'min_horas': 20, 
+                'max_horas': 40,
+                'actividades': [
+                    'Coordinación de despliegue',
+                    'Gestión de stakeholders',
+                    'Planificación de rollout'
+                ]
+            },
+            {
+                'rol': 'Capacitador', 
+                'tarifa_defecto': 8000, 
+                'min_horas': 20, 
+                'max_horas': 40,
+                'actividades': [
+                    'Preparación de material de capacitación',
+                    'Sesiones de entrenamiento',
+                    'Documentación de usuario'
+                ]
+            },
+            {
+                'rol': 'Soporte Técnico', 
+                'tarifa_defecto': 9000, 
+                'min_horas': 20, 
+                'max_horas': 20,
+                'actividades': [
+                    'Soporte inicial',
+                    'Resolución de incidencias',
+                    'Configuración de entorno'
+                ]
+            }
+        ]
+    },
+    {
+        'nombre': 'Ajustes y Estabilización',
+        'roles': [
+            {
+                'rol': 'Data Scientist', 
+                'tarifa_defecto': 9000, 
+                'min_horas': 20, 
+                'max_horas': 30,
+                'actividades': [
+                    'Afinamiento de modelos',
+                    'Análisis de rendimiento',
+                    'Mejora continua'
+                ]
+            },
+            {
+                'rol': 'Programador', 
+                'tarifa_defecto': 10000, 
+                'min_horas': 20, 
+                'max_horas': 30,
+                'actividades': [
+                    'Correcciones finales',
+                    'Optimización de código',
+                    'Preparación de versión estable'
+                ]
+            }
+        ]
+    }
+]
 
-    # Display the existing chat messages via `st.chat_message`.
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+def calcular_tokens_por_comentario(palabras_por_comentario=50):
+    return palabras_por_comentario * TOKENS_POR_PALABRA
 
-    # Create a chat input field to allow the user to enter a message. This will display
-    # automatically at the bottom of the page.
-    if prompt := st.chat_input("What is up?"):
+def generar_interfaz_dimensionamiento():
+    st.title('Despliegue HI Work')
+    
+    # Configuración de consumo de GenAI
+    st.sidebar.header('Consumo de GenAI')
+    comentarios_por_mes = st.sidebar.number_input(
+        'Comentarios procesados por mes', 
+        min_value=0, value=10000, step=100
+    )
+    costo_tokens = st.sidebar.number_input(
+        'Costo por 1000 tokens ($)', 
+        min_value=0.0, value=0.01, step=0.001, format='%f'
+    )
+    
+    tokens_por_comentario = calcular_tokens_por_comentario()
+    tokens_procesados = (comentarios_por_mes * tokens_por_comentario) / 1000
+    costo_genai = tokens_procesados * costo_tokens
+    
+    st.sidebar.markdown(f"**Tokens por comentario:** {tokens_por_comentario:.2f}")
+    st.sidebar.markdown(f"**Estimado Mensual GenAI:** ${costo_genai:.2f}")
 
-        # Store and display the current prompt.
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+    # Interfaz de dimensionamiento
+    for etapa in ETAPAS:
+        st.header(etapa['nombre'])
+        
+        # Mostrar actividades
+        with st.expander('Actividades'):
+            for actividad in etapa['roles'][0]['actividades']:
+                st.markdown(f"- {actividad}")
+        
+        for rol_data in etapa['roles']:
+            col1, col2, col3 = st.columns([2, 1, 1])
+            
+            with col1:
+                st.write(f"**{rol_data['rol']}**")
+            
+            with col2:
+                tarifa = st.number_input(
+                    'Tarifa/Hora', 
+                    min_value=0, 
+                    value=rol_data['tarifa_defecto'],
+                    key=f"{etapa['nombre']}_{rol_data['rol']}_tarifa"
+                )
+            
+            with col3:
+                min_horas = st.number_input(
+                    'Horas Min', 
+                    min_value=0, 
+                    value=rol_data['min_horas'],
+                    key=f"{etapa['nombre']}_{rol_data['rol']}_min"
+                )
+                max_horas = st.number_input(
+                    'Horas Max', 
+                    min_value=0, 
+                    value=rol_data['max_horas'],
+                    key=f"{etapa['nombre']}_{rol_data['rol']}_max"
+                )
+    
+    # Generación de totalizador
+    totales_por_rol, totales_generales = generar_totalizador(ETAPAS)
+    mostrar_totalizador(totales_por_rol, totales_generales, costo_genai)
 
-        # Generate a response using the OpenAI API.
-        stream = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
-            stream=True,
-        )
+def generar_totalizador(etapas):
+    totales_por_rol = {}
+    totales_generales = {
+        'horas_min': 0,
+        'horas_max': 0,
+        'costo_min': 0,
+        'costo_max': 0
+    }
 
-        # Stream the response to the chat using `st.write_stream`, then store it in 
-        # session state.
-        with st.chat_message("assistant"):
-            response = st.write_stream(stream)
-        st.session_state.messages.append({"role": "assistant", "content": response})
+    for etapa in etapas:
+        for rol_data in etapa['roles']:
+            rol = rol_data['rol']
+            tarifa = st.session_state.get(
+                f"{etapa['nombre']}_{rol}_tarifa", 
+                rol_data['tarifa_defecto']
+            )
+            min_horas = st.session_state.get(
+                f"{etapa['nombre']}_{rol}_min", 
+                rol_data['min_horas']
+            )
+            max_horas = st.session_state.get(
+                f"{etapa['nombre']}_{rol}_max", 
+                rol_data['max_horas']
+            )
+
+            if rol not in totales_por_rol:
+                totales_por_rol[rol] = {
+                    'tarifa': tarifa,
+                    'horas_min': 0,
+                    'horas_max': 0,
+                    'costo_min': 0,
+                    'costo_max': 0
+                }
+
+            totales_por_rol[rol]['horas_min'] += min_horas
+            totales_por_rol[rol]['horas_max'] += max_horas
+            totales_por_rol[rol]['costo_min'] += min_horas * tarifa
+            totales_por_rol[rol]['costo_max'] += max_horas * tarifa
+
+            totales_generales['horas_min'] += min_horas
+            totales_generales['horas_max'] += max_horas
+            totales_generales['costo_min'] += min_horas * tarifa
+            totales_generales['costo_max'] += max_horas * tarifa
+
+    return totales_por_rol, totales_generales
+
+def mostrar_totalizador(totales_por_rol, totales_generales, costo_genai):
+    st.header('Resumen General')
+
+    df_totales = pd.DataFrame.from_dict(totales_por_rol, orient='index')
+    df_totales.index.name = 'Rol'
+    df_totales = df_totales.reset_index()
+
+    st.dataframe(df_totales, use_container_width=True)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### Totales Generales")
+        st.markdown(f"**Horas Mínimas:** {totales_generales['horas_min']}")
+        st.markdown(f"**Horas Máximas:** {totales_generales['horas_max']}")
+        st.markdown(f"**Costo Mínimo:** ${totales_generales['costo_min']:,.2f}")
+        st.markdown(f"**Costo Máximo:** ${totales_generales['costo_max']:,.2f}")
+
+    with col2:
+        st.markdown("### Costos Adicionales")
+        st.markdown(f"**Estimado Mensual GenAI:** ${costo_genai:.2f}")
+
+    costo_total_min = totales_generales['costo_min'] + costo_genai
+    costo_total_max = totales_generales['costo_max'] + costo_genai
+
+    st.markdown(
+        f"""
+        <div style="background-color: #E0F2F1; padding: 10px; border-radius: 5px;">
+            <h3 style="text-align: center;">Costo Total del Proyecto</h3>
+            <p style="text-align: center;"><strong>Mínimo:</strong> ${costo_total_min:,.2f}</p>
+            <p style="text-align: center;"><strong>Máximo:</strong> ${costo_total_max:,.2f}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+def main():
+    generar_interfaz_dimensionamiento()
+
+if __name__ == '__main__':
+    main()
