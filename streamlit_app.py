@@ -332,8 +332,8 @@ def mostrar_totalizador(totales_por_rol, totales_generales, costo_genai):
         st.markdown("### Totales Generales")
         st.markdown(f"**Horas Mínimas:** {totales_generales['horas_min']}")
         st.markdown(f"**Horas Máximas:** {totales_generales['horas_max']}")
-        st.markdown(f"**Costo Mínimo:** ${totales_generales['costo_min']:,.2f}")
-        st.markdown(f"**Costo Máximo:** ${totales_generales['costo_max']:,.2f}")
+        #st.markdown(f"**Costo Mínimo:** ${totales_generales['costo_min']:,.2f}")
+        #st.markdown(f"**Costo Máximo:** ${totales_generales['costo_max']:,.2f}")
 
     with col2:
         st.markdown("### Costos Adicionales")
