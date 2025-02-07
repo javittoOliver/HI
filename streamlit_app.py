@@ -4,6 +4,7 @@ import io
 from io import BytesIO
 import requests
 from PIL import Image
+import base64
 
 # Tokens: Aproximadamente 4.5 tokens por palabra en español
 TOKENS_POR_PALABRA = 4.5
