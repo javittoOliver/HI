@@ -9,7 +9,7 @@ import base64
 # Tokens: Aproximadamente 4.5 tokens por palabra en español
 TOKENS_POR_PALABRA = 4.5
 
-#ruta_imagen = "https://i.ibb.co/S7Zz453q/Hi-dimen.jpg"
+ruta_imagen = r"Hi_dimen.jpg"
 
 
 ETAPAS = [
@@ -214,35 +214,31 @@ def calcular_tokens_por_comentario(palabras_por_comentario=50):
     return palabras_por_comentario * TOKENS_POR_PALABRA
 
 def generar_interfaz_dimensionamiento():
-    
-    #response = requests.get(ruta_imagen)
 
-
-    #if response.status_code == 200:
-        #image = Image.open(BytesIO(response.content))
+    # Cargar la imagen Hiwork
+    image = Image.open(ruta_imagen)
     
-        # Convertir la imagen a base64
-        #buffered = BytesIO()
-        #image.save(buffered, format="PNG")
-        #img_str = base64.b64encode(buffered.getvalue()).decode()
-    
-        # Mostrar la imagen en Streamlit
-        #st.image(image, caption="Imagen cargada desde URL")
-    #else:
-        #st.error("No se pudo cargar la imagen desde la URL")
+    # Convertir la imagen a base64
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
     
     # Crear el HTML para una imagen responsiva
-    #st.markdown(
-        #f"""
-        #<style>
-        #.responsive-img {{
-            #width: 35%;
-            #max-width: 500px;
-            #height: auto;}}
-        #</style>
-        #<img src="data:image/png;base64,{img_str}" class="responsive-img">""", unsafe_allow_html=True
-        #)
-    st.title('Despliegue HI Work')
+    st.markdown(
+        f"""
+        <style>
+        .responsive-img {{
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+        }}
+        </style>
+        <img src="data:image/png;base64,{img_str}" class="responsive-img">
+        """,
+        unsafe_allow_html=True
+        )
+    
+    #st.title('Despliegue HI Work')
     
     
     # Configuración de consumo de GenAI
