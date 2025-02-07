@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import io
 
 # Tokens: Aproximadamente 4.5 tokens por palabra en español
 TOKENS_POR_PALABRA = 4.5
