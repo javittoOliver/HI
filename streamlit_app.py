@@ -211,6 +211,7 @@ def calcular_tokens_por_comentario(palabras_por_comentario=50):
 def generar_interfaz_dimensionamiento():
     st.title('Despliegue HI Work')
     
+    
     # Configuración de consumo de GenAI
     st.sidebar.header('Consumo de GenAI')
     comentarios_por_mes = st.sidebar.number_input(
@@ -228,10 +229,9 @@ def generar_interfaz_dimensionamiento():
     
     st.sidebar.markdown(f"**Tokens por comentario:** {tokens_por_comentario:.2f}")
     st.sidebar.markdown(f"**Estimado Mensual GenAI:** ${costo_genai:.2f}")
-    
+
     # Lista para almacenar los datos del Excel
     datos_excel = []
-    
     # Interfaz de dimensionamiento
     for etapa in ETAPAS:
         st.header(etapa['nombre'])
@@ -270,7 +270,7 @@ def generar_interfaz_dimensionamiento():
                     value=rol_data['max_horas'],
                     key=f"{etapa['nombre']}_{rol_data['rol']}_max"
                 )
-                
+            
             # Agregar los datos al Excel
             for actividad in rol_data['actividades']:
                 datos_excel.append([etapa['nombre'], actividad, rol_data['rol'], f"{min_horas}-{max_horas}", tarifa])    
@@ -289,11 +289,13 @@ def generar_interfaz_dimensionamiento():
         label="📥 Descargar Excel",
         data=output,
         file_name="dimensionamiento.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")                
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     
     # Generación de totalizador
-    totales_por_rol, totales_generales = generar_totalizador(ETAPAS)
+    totales_por_rol, totales_generales = generar_totalizador(ETAPAS)              
     mostrar_totalizador(totales_por_rol, totales_generales, costo_genai)
+
+  
 
 def generar_totalizador(etapas):
     totales_por_rol = {}
