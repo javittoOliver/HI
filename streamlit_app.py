@@ -227,7 +227,10 @@ def generar_interfaz_dimensionamiento():
     
     st.sidebar.markdown(f"**Tokens por comentario:** {tokens_por_comentario:.2f}")
     st.sidebar.markdown(f"**Estimado Mensual GenAI:** ${costo_genai:.2f}")
-
+    
+    # Lista para almacenar los datos del Excel
+    datos_excel = []
+    
     # Interfaz de dimensionamiento
     for etapa in ETAPAS:
         st.header(etapa['nombre'])
@@ -266,6 +269,26 @@ def generar_interfaz_dimensionamiento():
                     value=rol_data['max_horas'],
                     key=f"{etapa['nombre']}_{rol_data['rol']}_max"
                 )
+                
+            # Agregar los datos al Excel
+            for actividad in rol_data['actividades']:
+                datos_excel.append([etapa['nombre'], actividad, rol_data['rol'], f"{min_horas}-{max_horas}", tarifa])    
+    
+    # Crear DataFrame para exportar a Excel
+    df_excel = pd.DataFrame(datos_excel, columns=["Etapa", "Actividades", "Rol", "Hs", "Costo-hs"])
+    
+    # Generar el archivo Excel en memoria
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        df_excel.to_excel(writer, index=False, sheet_name="Dimensionamiento")
+    output.seek(0)
+
+    # Botón de descarga
+    st.download_button(
+        label="📥 Descargar Excel",
+        data=output,
+        file_name="dimensionamiento.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")                
     
     # Generación de totalizador
     totales_por_rol, totales_generales = generar_totalizador(ETAPAS)
