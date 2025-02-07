@@ -11,7 +11,7 @@ ETAPAS = [
         'nombre': 'Análisis y Preparación Inicial',
         'roles': [
             {
-                'rol': 'Arquitecto de Soluciones', 
+                'rol': 'Soporte Técnico', 
                 'tarifa_defecto': 9000, 
                 'min_horas': 10, 
                 'max_horas': 20,
@@ -49,12 +49,12 @@ ETAPAS = [
         'nombre': 'Configuración de Infraestructura',
         'roles': [
             {
-                'rol': 'Administrador de Sistemas', 
+                'rol': 'Administrador de Base de Datos', 
                 'tarifa_defecto': 9000, 
                 'min_horas': 30, 
                 'max_horas': 50,
                 'actividades': [
-                    'Preparación de Servidor-es',
+                    'Preparación de servidores',
                     'Configuración de VPN',
                     'Instalación de herramientas'
                 ]
@@ -94,9 +94,7 @@ ETAPAS = [
                 'actividades': [
                     'Desarrollo de módulo Happiness Index',
                     'Implementación de modelo de Sentiment Analysis',
-                    'Implementación de modelo de Tópicos',
-                    'Entrenamiento de modelos de IA Generativa Loope',
-                    'Desarrollo front en Power Bi'
+                    'Entrenamiento de modelos de IA Generativa Loope'
                 ]
             },
             {
@@ -216,7 +214,7 @@ def generar_interfaz_dimensionamiento():
     st.sidebar.header('Consumo de GenAI')
     comentarios_por_mes = st.sidebar.number_input(
         'Comentarios procesados por mes', 
-        min_value=0, value=50000, step=100
+        min_value=0, value=10000, step=100
     )
     costo_tokens = st.sidebar.number_input(
         'Costo por 1000 tokens ($)', 
@@ -236,8 +234,10 @@ def generar_interfaz_dimensionamiento():
         
         # Mostrar actividades
         with st.expander('Actividades'):
-            for actividad in etapa['roles'][0]['actividades']:
-                st.markdown(f"- {actividad}")
+            for rol_data in etapa['roles']:  # Iteramos sobre todos los roles
+                st.markdown(f"**{rol_data['rol']}**")  # Nombre del rol
+                for actividad in rol_data['actividades']:
+                    st.markdown(f"- {actividad}")
         
         for rol_data in etapa['roles']:
             col1, col2, col3 = st.columns([2, 1, 1])
@@ -247,7 +247,7 @@ def generar_interfaz_dimensionamiento():
             
             with col2:
                 tarifa = st.number_input(
-                    'Costo/Hora', 
+                    'Tarifa/Hora', 
                     min_value=0, 
                     value=rol_data['tarifa_defecto'],
                     key=f"{etapa['nombre']}_{rol_data['rol']}_tarifa"
@@ -332,8 +332,8 @@ def mostrar_totalizador(totales_por_rol, totales_generales, costo_genai):
         st.markdown("### Totales Generales")
         st.markdown(f"**Horas Mínimas:** {totales_generales['horas_min']}")
         st.markdown(f"**Horas Máximas:** {totales_generales['horas_max']}")
-        #st.markdown(f"**Costo Mínimo:** ${totales_generales['costo_min']:,.2f}")
-        #st.markdown(f"**Costo Máximo:** ${totales_generales['costo_max']:,.2f}")
+        st.markdown(f"**Costo Mínimo:** ${totales_generales['costo_min']:,.2f}")
+        st.markdown(f"**Costo Máximo:** ${totales_generales['costo_max']:,.2f}")
 
     with col2:
         st.markdown("### Costos Adicionales")
