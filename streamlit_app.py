@@ -6,7 +6,7 @@ from PIL import Image
 
 # Tokens: Aproximadamente 4.5 tokens por palabra en español
 TOKENS_POR_PALABRA = 4.5
-
+ruta_imagen = "https://i.ibb.co/S7Zz453q/Hi-dimen.jpg"
 
 
 ETAPAS = [
@@ -211,7 +211,7 @@ def calcular_tokens_por_comentario(palabras_por_comentario=50):
     return palabras_por_comentario * TOKENS_POR_PALABRA
 
 def generar_interfaz_dimensionamiento():
-    ruta_imagen = "https://i.ibb.co/S7Zz453q/Hi-dimen.jpg"
+    
     response = requests.get(ruta_imagen)
 
 
