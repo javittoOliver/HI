@@ -209,7 +209,38 @@ def calcular_tokens_por_comentario(palabras_por_comentario=50):
     return palabras_por_comentario * TOKENS_POR_PALABRA
 
 def generar_interfaz_dimensionamiento():
-    st.title('Despliegue HI Work')
+    ruta_imagen = "https://i.ibb.co/S7Zz453q/Hi-dimen.jpg"
+    response = requests.get(ruta_imagen)
+
+
+    if response.status_code == 200:
+        image = Image.open(BytesIO(response.content))
+    
+        # Convertir la imagen a base64
+        buffered = BytesIO()
+        image.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+    
+        # Mostrar la imagen en Streamlit
+        #st.image(image, caption="Imagen cargada desde URL")
+    else:
+        st.error("No se pudo cargar la imagen desde la URL")
+    
+    # Crear el HTML para una imagen responsiva
+    st.markdown(
+        f"""
+        <style>
+        .responsive-img {{
+            width: 35%;
+            max-width: 500px;
+            height: auto;
+        }}
+        </style>
+        <img src="data:image/png;base64,{img_str}" class="responsive-img">
+        """,
+        unsafe_allow_html=True
+        )
+    #st.title('Despliegue HI Work')
     
     
     # Configuración de consumo de GenAI
